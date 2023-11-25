@@ -6,8 +6,6 @@
 int getImageType(const char* filename) {
     int width, height, channels;
     unsigned char* imgData = stbi_load(filename, &width, &height, &channels,0);
-    
-    
     return channels;
 }
 

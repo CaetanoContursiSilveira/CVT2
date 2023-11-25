@@ -53,6 +53,9 @@ Pixel* pixelToCol(Pixel** matrix, int x, int y, int height, int width) {
     return column; 
 }
 
+//sum e o q vai dividir cada pixel
+//size e o tamanho da coluna que vai ser o kernel
+//cols e a dimensao da coluna e linha do kernel
 Img* resultImage(Img* in, int* kernel, int sum, int size, int cols) {
     Img* out = (Img*)malloc(sizeof(Img));
     out->width = in->width;
@@ -129,9 +132,11 @@ int main(int argc, char *argv[]) {
 	
 	if(imageType == 3){
 		if(padding = 1){
-			img = RGBPadding0(argv[1],col -1);
-			Img* imgOut = resultImage(img, kernel, sum,k,cols);
-			if (saveRGBImage("resultado.png", imgOut) != 0) {
+			img = RGBPadding1(argv[1],col -1);
+			Img* im = loadRGBImage(argv[1]);
+			//Img* imgOut = resultImage(img, kernel, sum,k,cols);
+			saveRGBImage("teste2.png",im);
+			if (saveRGBImage("resultado.png", img) != 0) {
 				printf("RBG ok\n");
 			} else {
 				printf("Erro RGB\n");
