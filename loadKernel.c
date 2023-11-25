@@ -8,7 +8,6 @@ int** loadKernel(const char* filename, int* rows, int* cols) {
         fprintf(stderr, "Falha ao ler arquivo: %s\n", filename);
         return NULL;
     }
-
     *rows = 0;
     *cols = 0;
     int tempCols = 0;
