@@ -21,6 +21,11 @@ typedef struct {
 int getImageType(const char* filename);
 Img* loadRGBImage(const char* filename);
 Grayscale* loadGrayscaleImage(const char* filename);
+//0 para kernel sem pixel central, 1 caso tenha
+Img* RGBPadding0(const char* filename, int n);
+Img* RGBPadding1(const char* filename, int n);
+Grayscale* GrayscalePadding0(const char* filename, int n);
+Grayscale* GrayscalePadding1(const char* filename, int n);
 int saveRGBImage(const char* filename, Img* img);
 int saveGrayscaleImage(const char* filename, Grayscale* grayscale);
 
