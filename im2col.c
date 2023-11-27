@@ -2,15 +2,13 @@
 #include "loadImage.h"
 #include <stdlib.h>
 
-
-
 Pixel resultPixel(int* kernel, Pixel* pixels, int sum, int size) {
     Pixel result = {0, 0, 0};
 
     for (int i = 0; i < size; i++) {
-        result.r += (int)kernel[i] * pixels[i].r;
-        result.g += (int)kernel[i] * pixels[i].g;
-        result.b += (int)kernel[i] * pixels[i].b;
+        result.r += kernel[i] * pixels[i].r;
+        result.g += kernel[i] * pixels[i].g;
+        result.b += kernel[i] * pixels[i].b;
     }
     result.r = (result.r / sum);
     result.g = (result.g / sum);
@@ -21,7 +19,10 @@ Pixel resultPixel(int* kernel, Pixel* pixels, int sum, int size) {
 	if (result.r < 0) result.r = 0;
 	if (result.g < 0) result.g = 0;
 	if (result.b < 0) result.b = 0;
-
+	fflush(stdout);
+	printf("%d", result.r);
+	printf("%d", result.g);
+	printf("%d", result.b);
 	result.r = (unsigned char)result.r;
 	result.g = (unsigned char)result.g;
 	result.b = (unsigned char)result.b;
@@ -53,26 +54,30 @@ Pixel* pixelToCol(Pixel** matrix, int x, int y, int height, int width) {
     return column; 
 }
 
-//sum e o q vai dividir cada pixel
-//size e o tamanho da coluna que vai ser o kernel
-//cols e a dimensao da coluna e linha do kernel
-Img* resultImage(Img* in, int* kernel, int sum, int size, int cols) {
-    Img* out = (Img*)malloc(sizeof(Img));
-    out->width = in->width;
-    out->height = in->height;
-    out->data = (Pixel**)malloc(out->height * sizeof(Pixel*));
-
-    for (int i = 0; i < out->height; i++) {
-        out->data[i] = (Pixel*)malloc(out->width * sizeof(Pixel));
-        for (int j = 0; j < out->width; j++) {
-            Pixel* buffer = pixelToCol(in->data, i, j, cols, cols);
-            Pixel result = resultPixel(kernel, buffer, sum, size);
-            out->data[i][j] = result;
-            free(buffer); 
-        }
-    }
-
-    return out;
+Img* resultImage(Img* in, int* kernel, int sum, int ksize,int klength){
+	int x,y;
+	x = in->width - 2*(ksize -2);
+	y = in->height - 2*(ksize -2);
+	Img* out = (Img*)malloc(x * y * sizeof(Img));
+	out->width = x;
+	out->height = y;
+	out->data = (Pixel**)malloc(y * sizeof(Pixel*));
+	for(int i = 0; i < y; i++){
+		out->data[i] = (Pixel*)malloc(x * sizeof(Pixel));
+		for(int j = 0; j < x; j++){
+			Pixel* column = pixelToCol(in->data, i, j, ksize, ksize);
+			 if (column != NULL) {//erro ta aqui
+                Pixel result = resultPixel(kernel, column, sum, klength);
+                out->data[i][j] = result;
+                free(column);
+            } else {
+                free(out->data);
+                free(out);
+                return NULL;
+            }
+		}
+	}
+	return out;
 }
 
 unsigned char* constToCol(unsigned char** matrix, int x, int y, int height, int width) {
@@ -126,17 +131,19 @@ int main(int argc, char *argv[]) {
     }
     printf("\n");
 	}
-	int col = cols;
+	int size = cols * cols;
 	int padding = atoi(argv[4]);
 	///////////////////////////////////////////
 	
 	if(imageType == 3){
-		if(padding = 1){
+		if(padding == 1){
 			img = RGBPadding1(argv[1],n);
 			Img* im = loadRGBImage(argv[1]);
-			//Img* imgOut = resultImage(img, kernel, sum,k,cols);
-			saveRGBImage("teste2.png",im);
-			if (saveRGBImage("resultado.png", img) != 0) {
+			if(saveRGBImage("padding.png", img)){
+				printf("Padding ok\n");
+			}
+			Img* i2 = resultImage(im, kernel, sum, cols, k);
+			if (saveRGBImage("resultado.png", i2) != 0) {
 				printf("RBG ok\n");
 			} else {
 				printf("Erro RGB\n");

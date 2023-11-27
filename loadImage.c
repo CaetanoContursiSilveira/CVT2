@@ -70,38 +70,6 @@ Img* RGBPadding1(const char* filename, int n) {
 }
 
 
-Img* RGBPadding0(const char* filename, int n) {
-    int width, height, channels;
-    unsigned char* imgData = stbi_load(filename, &width, &height, &channels, STBI_rgb);
-
-    if (channels != 3) {
-        return NULL;
-    }
-
-    if (imgData) {
-        Img* img = (Img*)malloc(sizeof(Img));
-        img->width = width;
-        img->height = height;
-
-        img->data = (Pixel**)calloc((height + n), sizeof(Pixel*));
-        for (int i = 0; i < height; i++) {
-            img->data[i] = (Pixel*)calloc((width + n), sizeof(Pixel));
-        }
-		for (int i = 0; i < height; i++) {
-			for (int j = 0; j < width; j++) {
-				int offset = (i * width + j) * 3;
-				img->data[i][j].r = imgData[offset];
-				img->data[i][j].g = imgData[offset + 1];
-				img->data[i][j].b = imgData[offset + 2];
-			}
-		}
-        stbi_image_free(imgData);
-        return img;
-   }
-
-    return NULL;
-}
-
 Grayscale* GrayscalePadding1(const char* filename, int n) {
     int width, height, channels;
     unsigned char* imgData = stbi_load(filename, &width, &height, &channels, STBI_grey);
@@ -126,37 +94,6 @@ Grayscale* GrayscalePadding1(const char* filename, int n) {
                 grayscale->k[i][j] = imgData[offset];
             }
         }
-        stbi_image_free(imgData);
-        return grayscale;
-    }
-
-    return NULL;
-}
-
-Grayscale* GrayscalePadding0(const char* filename, int n) {
-    int width, height, channels;
-    unsigned char* imgData = stbi_load(filename, &width, &height, &channels, STBI_grey);
-
-    if (channels != 1) {
-        return NULL;
-    }
-
-    if (imgData) {
-        Grayscale* grayscale = (Grayscale*)malloc(sizeof(Grayscale));
-        grayscale->width = width;
-        grayscale->height = height;
-        grayscale->k = (unsigned char**)calloc((height +  n), sizeof(unsigned char*));
-
-        for (int i = 0; i < height + 2 * n; i++) {
-            grayscale->k[i] = (unsigned char*)calloc((width +  n), sizeof(unsigned char));
-        }
-
-        for (int i = 0; i < height + 2 * n; i++) {
-			for (int j = 0; j < width + 2 * n; j++) {
-				int offset = i * width + j;
-                    grayscale->k[i][j] = imgData[offset];
-                }
-            }
         stbi_image_free(imgData);
         return grayscale;
     }
@@ -198,7 +135,6 @@ int saveRGBImage(const char* filename, Img* img) {
         return 0;
     }
     
-    //transforma os pixels em unsigned char para chamar a funcao
     int channels = 3;
     unsigned char* imgData = (unsigned char*)malloc(img->width * img->height * channels);
     for (int i = 0; i < img->height; i++) {
@@ -209,11 +145,8 @@ int saveRGBImage(const char* filename, Img* img) {
             imgData[offset + 2] = img->data[i][j].b;
         }
     }
-    
-    //funcao do stb image para gerar a imagem
     int result = stbi_write_png(filename, img->width, img->height, channels, imgData, img->width * channels);
     free(imgData);
-    //para saber se gerou a imagem
     return result;
 }
 
