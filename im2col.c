@@ -40,13 +40,7 @@ Pixel* pixelToCol(Pixel** matrix, int x, int y, int height, int width) {
             int pixel_x = x + i;
             int pixel_y = y + j;
 
-            if (pixel_x >= 0 && pixel_x < height && pixel_y >= 0 && pixel_y < width) {
-                column[col_index] = matrix[pixel_x][pixel_y];
-            } else {
-                free(column); 
-                return NULL;
-            }
-
+            column[col_index] = matrix[pixel_x][pixel_y];
             col_index++;
         }
     }
@@ -56,9 +50,10 @@ Pixel* pixelToCol(Pixel** matrix, int x, int y, int height, int width) {
 
 Img* resultImage(Img* in, int* kernel, int sum, int ksize,int klength){
 	int x,y;
-	x = in->width - 2*(ksize -2);
-	y = in->height - 2*(ksize -2);
-	Img* out = (Img*)malloc(x * y * sizeof(Img));
+	x = in->width -2*(ksize -2); 
+	y = in->height -  2*(ksize -2);
+	printf("(%d,%d)",x,y); 
+	Img* out = (Img*)malloc(sizeof(Img));
 	out->width = x;
 	out->height = y;
 	out->data = (Pixel**)malloc(y * sizeof(Pixel*));
@@ -66,6 +61,7 @@ Img* resultImage(Img* in, int* kernel, int sum, int ksize,int klength){
 		out->data[i] = (Pixel*)malloc(x * sizeof(Pixel));
 		for(int j = 0; j < x; j++){
 			Pixel* column = pixelToCol(in->data, i, j, ksize, ksize);
+			printf("[%d][%d]",i,j);
 			 if (column != NULL) {//erro ta aqui
                 Pixel result = resultPixel(kernel, column, sum, klength);
                 out->data[i][j] = result;
@@ -127,10 +123,11 @@ int main(int argc, char *argv[]) {
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			kernel[k] = kernel0[i][j];
+			printf("|%d|", kernel[k]);
 			k++;
-    }
-    printf("\n");
+		}
 	}
+	printf("\n");
 	int size = cols * cols;
 	int padding = atoi(argv[4]);
 	///////////////////////////////////////////
@@ -142,7 +139,7 @@ int main(int argc, char *argv[]) {
 			if(saveRGBImage("padding.png", img)){
 				printf("Padding ok\n");
 			}
-			Img* i2 = resultImage(im, kernel, sum, cols, k);
+			Img* i2 = resultImage(img, kernel, sum, cols, k);
 			if (saveRGBImage("resultado.png", i2) != 0) {
 				printf("RBG ok\n");
 			} else {
